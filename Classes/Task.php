@@ -39,7 +39,7 @@ class Task
        $this->actual_status = $actual_status;
     }
 
-    public function getNextStatus($action) {
+    public function getNextStatus(string $action):string {
         switch ($action) {
             case self::ACTION_START:
                 return self::STATUS_PROCESSING;
@@ -54,15 +54,15 @@ class Task
                 return self::STATUS_FAILED;
                 break;
             default:
-                return null;
+                return '';
 
         }
     }
-    public function getLabel($code) {
-        return self::MAP_LABELS[$code] ?? null;
+    public function getLabel($code):string {
+        return self::MAP_LABELS[$code] ?? '';
     }
 
-    public function availableActions() {
+    public function availableActions():array {
 
             switch ($this->actual_status) {
                 case self::STATUS_NEW:

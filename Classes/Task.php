@@ -18,8 +18,8 @@ class Task
     const MAP_LABELS = [
         self::STATUS_NEW => 'Задание опубликовано, исполнитель ещё не найден',
         self::STATUS_CANCELED => 'Заказчик отменил задание',
-        self::STATUS_PROCESSING => 'Заказчик выбрал исполнителя для задания',
-        self::STATUS_DONE => 'Заказчик отметил задание как выполненное',
+        self::STATUS_PROCESSING => 'Задание в процессе исполнения',
+        self::STATUS_DONE => 'Задание выполнено',
         self::STATUS_FAILED => 'Исполнитель отказался от выполнения задания',
         self::ACTION_START => 'Начало исполнения задачи',
         self::ACTION_RESPONSE => 'Отклик на задание',
@@ -39,38 +39,34 @@ class Task
        $this->actual_status = $actual_status;
     }
 
-    public function getNextStatus(string $action):string {
+    public function getNextStatus(string $action):string
+    {
         switch ($action) {
             case self::ACTION_START:
                 return self::STATUS_PROCESSING;
-                break;
             case self::ACTION_COMPLETE:
                 return self::STATUS_DONE;
-                break;
             case self::ACTION_CANCEL:
                 return self::STATUS_CANCELED;
-                break;
             case self::ACTION_FAIL:
                 return self::STATUS_FAILED;
-                break;
             default:
                 return '';
 
         }
     }
-    public function getLabel($code):string {
+    public function getLabel($code):string
+    {
         return self::MAP_LABELS[$code] ?? '';
     }
 
-    public function availableActions():array {
-
+    public function availableActions():array
+    {
             switch ($this->actual_status) {
                 case self::STATUS_NEW:
                     return [self::STATUS_CANCELED, self::STATUS_PROCESSING];
-                    break;
-                case self::STATUS_PROGRERESS:
+                case self::STATUS_PROCESSING:
                     return [self::STATUS_DONE, self::STATUS_FAILED];
-                    break;
                 default:
                     return [];
             }

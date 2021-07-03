@@ -1,5 +1,7 @@
 <?php
-require_once 'Classes/Task.php';
+use taskforce\models\Task;
+
+require_once 'vendor/autoload.php';
 
 $customer_id = 1;
 $executor_id = 2;

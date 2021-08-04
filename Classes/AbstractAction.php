@@ -1,7 +1,5 @@
 <?php
 
-namespace actions;
-
 abstract class AbstractAction
 {
     abstract protected function getName();

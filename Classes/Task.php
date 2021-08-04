@@ -1,10 +1,11 @@
 <?php
 
-use actions\StartAction;
-use actions\ResponseAction;
-use actions\CompleteAction;
-use actions\CancelAction;
-use actions\FailAction;
+require_once 'Classes/StartAction.php';
+require_once 'Classes/ResponseAction.php';
+require_once 'Classes/CompleteAction.php';
+require_once 'Classes/CancelAction.php';
+require_once 'Classes/FailAction.php';
+
 
 class Task
 {
@@ -14,23 +15,11 @@ class Task
 	const STATUS_DONE = 'action_done';
 	const STATUS_FAILED = 'action_failed';
 
-    const ACTION_START = 'start';
-    const ACTION_RESPONSE = 'response';
-    const ACTION_COMPLETE = 'complete';
-    const ACTION_CANCEL = 'cancel';
-    const ACTION_FAIL = 'fail';
-
     const MAP_LABELS = [
         self::STATUS_NEW => 'Задание опубликовано, исполнитель ещё не найден',
         self::STATUS_CANCELED => 'Заказчик отменил задание',
         self::STATUS_PROCESSING => 'Задание в процессе исполнения',
         self::STATUS_DONE => 'Задание выполнено',
-        self::STATUS_FAILED => 'Исполнитель отказался от выполнения задания',
-        self::ACTION_START => 'Начало исполнения задачи',
-        self::ACTION_RESPONSE => 'Отклик на задание',
-        self::ACTION_COMPLETE => 'Задача завершена',
-        self::ACTION_CANCEL => 'Отменено',
-        self::ACTION_FAIL => 'Провалено',
 	];
 
     /**
@@ -97,20 +86,20 @@ class Task
         return self::MAP_LABELS[$code] ?? '';
     }
 
-    public function availableActions():object
+    public function availableActions():string
     {
             switch ($this->actual_status) {
                 case self::STATUS_NEW:
                     if ($this->cancelAction->VerificationRight($this->customer_id, $this->executor_id, $this->user_id)) {
-                        return $this->cancelAction;
+                        return self::STATUS_CANCELED;
                     } else {
-                        return $this->responseAction;
+                        return self::STATUS_PROCESSING;
                     }
                 case self::STATUS_PROCESSING:
                     if ($this->completeAction->VerificationRight($this->customer_id, $this->executor_id, $this->user_id)) {
-                        return $this->completeAction;
+                        return self::STATUS_DONE;
                     } else {
-                        return $this->failAction;
+                        return self::STATUS_FAILED;
                     }
             }
     }

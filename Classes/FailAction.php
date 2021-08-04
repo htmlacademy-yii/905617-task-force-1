@@ -1,6 +1,6 @@
 <?php
 
-namespace actions;
+require_once 'Classes/AbstractAction.php';
 
 class FailAction extends AbstractAction
 {

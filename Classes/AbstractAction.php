@@ -1,5 +1,7 @@
 <?php
 
+namespace myorg;
+
 abstract class AbstractAction
 {
     abstract protected function getName();

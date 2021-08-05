@@ -1,11 +1,6 @@
 <?php
 
-require_once 'Classes/StartAction.php';
-require_once 'Classes/ResponseAction.php';
-require_once 'Classes/CompleteAction.php';
-require_once 'Classes/CancelAction.php';
-require_once 'Classes/FailAction.php';
-
+namespace myorg;
 
 class Task
 {

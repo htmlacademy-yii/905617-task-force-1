@@ -1,17 +1,13 @@
 {
-    "name": "kate/test",
-    "type": "n",
-    "license": "n",
-    "authors": [
-        {
-            "name": "Name Name",
-            "email": "tast@mail.ru"
-        }
-    ],
-    "autoload": {
-       "psr-4": {
-         "taskforce\\": "src/"
-       }
-    },
-    "require": {}
+  "name": "test/app",
+  "type": "project",
+  "require": {
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "taskforce\\": "src/"
+    }
+  }
 }

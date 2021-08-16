@@ -16,7 +16,7 @@ class Task
 	const STATUS_DONE = 'action_done';
 	const STATUS_FAILED = 'action_failed';
 
-    const MAP_LABELS = [
+  const MAP_LABELS = [
         self::STATUS_NEW => 'Задание опубликовано, исполнитель ещё не найден',
         self::STATUS_CANCELED => 'Заказчик отменил задание',
         self::STATUS_PROCESSING => 'Задание в процессе исполнения',
@@ -50,7 +50,7 @@ class Task
 
 	public $customer_id;
 	public $executor_id;
-    public $user_id;
+  public $user_id;
 	public $actual_status;
 
     public function __construct($customer_id, $executor_id, $user_id, $actual_status)

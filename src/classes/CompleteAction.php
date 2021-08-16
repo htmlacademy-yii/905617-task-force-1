@@ -12,7 +12,7 @@ class CompleteAction extends AbstractAction
         return 'Задача завершена';
     }
 
-    public function VerificationRight($customer_id, $executor_id, $user_id):bool {
+    public function verificationRight($customer_id, $executor_id, $user_id):bool {
         if ($customer_id === $user_id) {
             return true;
         } else {

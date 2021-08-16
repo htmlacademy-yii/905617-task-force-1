@@ -87,24 +87,29 @@ class Task
         return self::MAP_LABELS[$code] ?? '';
     }
 
-    public function availableActions()
+    public function availableActions():array
     {
+        $possible_actions = [];
+
         switch ($this->actual_status) {
             case self::STATUS_NEW:
-                if ($this->cancelAction->VerificationRight($this->customer_id, $this->executor_id, $this->user_id)) {
-                    return $this->cancelAction;
+                if ($this->cancelAction->verificationRight($this->customer_id, $this->executor_id, $this->user_id)) {
+                    $possible_actions[] = $this->startAction;
+                    $possible_actions[] = $this->cancelAction;
                 } else {
-                    return $this->responseAction;
+                    $possible_actions[] = $this->responseAction;
                 }
+                break;
             case self::STATUS_PROCESSING:
-                if ($this->completeAction->VerificationRight($this->customer_id, $this->executor_id, $this->user_id)) {
-                    return $this->completeAction;
+                if ($this->completeAction->verificationRight($this->customer_id, $this->executor_id, $this->user_id)) {
+                    $possible_actions[] = $this->completeAction;
                 } else {
-                    return $this->failAction;
+                    $possible_actions[] = $this->failAction;
                 }
-            default:
-                return false;
+                break;
         }
+
+        return $possible_actions;
     }
 
 }

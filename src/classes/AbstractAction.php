@@ -15,5 +15,5 @@ abstract class AbstractAction
         return $this->label;
     }
 
-    abstract protected function VerificationRight($customer_id, $executor_id, $user_id);
+    abstract protected function verificationRight($customer_id, $executor_id, $user_id);
 }

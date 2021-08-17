@@ -2,6 +2,12 @@
 
 namespace taskforce\models;
 
+use taskforce\classes\StartAction;
+use taskforce\classes\ResponseAction;
+use taskforce\classes\CompleteAction;
+use taskforce\classes\CancelAction;
+use taskforce\classes\FailAction;
+
 class Task
 {
 	const STATUS_NEW = 'new';
@@ -10,46 +16,66 @@ class Task
 	const STATUS_DONE = 'action_done';
 	const STATUS_FAILED = 'action_failed';
 
-    const ACTION_START = 'start';
-    const ACTION_RESPONSE = 'response';
-    const ACTION_COMPLETE = 'complete';
-    const ACTION_CANCEL = 'cancel';
-    const ACTION_FAIL = 'fail';
-
-    const MAP_LABELS = [
+  const MAP_LABELS = [
         self::STATUS_NEW => 'Задание опубликовано, исполнитель ещё не найден',
         self::STATUS_CANCELED => 'Заказчик отменил задание',
         self::STATUS_PROCESSING => 'Задание в процессе исполнения',
         self::STATUS_DONE => 'Задание выполнено',
-        self::STATUS_FAILED => 'Исполнитель отказался от выполнения задания',
-        self::ACTION_START => 'Начало исполнения задачи',
-        self::ACTION_RESPONSE => 'Отклик на задание',
-        self::ACTION_COMPLETE => 'Задача завершена',
-        self::ACTION_CANCEL => 'Отменено',
-        self::ACTION_FAIL => 'Провалено',
 	];
+
+    /**
+     * @var StartAction
+     */
+    private $startAction;
+
+    /**
+     * @var ResponseAction
+     */
+    private $responseAction;
+
+    /**
+     * @var CompleteAction
+     */
+    private $completeAction;
+
+    /**
+     * @var CancelAction
+     */
+    private $cancelAction ;
+
+    /**
+     * @var FailAction
+     */
+    private $failAction;
 
 	public $customer_id;
 	public $executor_id;
+  public $user_id;
 	public $actual_status;
 
-    public function __construct($customer_id, $executor_id, $actual_status)
+    public function __construct($customer_id, $executor_id, $user_id, $actual_status)
     {
        $this->customer_id = $customer_id;
        $this->executor_id = $executor_id;
+       $this->user_id = $user_id;
        $this->actual_status = $actual_status;
+       $this->startAction = new StartAction();
+       $this->responseAction = new ResponseAction();
+       $this->completeAction = new CompleteAction();
+       $this->cancelAction = new CancelAction();
+       $this->failAction = new FailAction();
     }
 
     public function getNextStatus(string $action):string
     {
         switch ($action) {
-            case self::ACTION_START:
+            case $this->startAction->getName():
                 return self::STATUS_PROCESSING;
-            case self::ACTION_COMPLETE:
+            case $this->completeAction->getName():
                 return self::STATUS_DONE;
-            case self::ACTION_CANCEL:
+            case $this->cancelAction->getName():
                 return self::STATUS_CANCELED;
-            case self::ACTION_FAIL:
+            case $this->failAction->getName():
                 return self::STATUS_FAILED;
             default:
                 return '';
@@ -63,14 +89,27 @@ class Task
 
     public function availableActions():array
     {
-            switch ($this->actual_status) {
-                case self::STATUS_NEW:
-                    return [self::STATUS_CANCELED, self::STATUS_PROCESSING];
-                case self::STATUS_PROCESSING:
-                    return [self::STATUS_DONE, self::STATUS_FAILED];
-                default:
-                    return [];
-            }
+        $possible_actions = [];
+
+        switch ($this->actual_status) {
+            case self::STATUS_NEW:
+                if ($this->cancelAction->verificationRight($this->customer_id, $this->executor_id, $this->user_id)) {
+                    $possible_actions[] = $this->startAction;
+                    $possible_actions[] = $this->cancelAction;
+                } else {
+                    $possible_actions[] = $this->responseAction;
+                }
+                break;
+            case self::STATUS_PROCESSING:
+                if ($this->completeAction->verificationRight($this->customer_id, $this->executor_id, $this->user_id)) {
+                    $possible_actions[] = $this->completeAction;
+                } else {
+                    $possible_actions[] = $this->failAction;
+                }
+                break;
+        }
+
+        return $possible_actions;
     }
 
 }

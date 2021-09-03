@@ -5,6 +5,7 @@ ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
 use taskforce\loader\DbLoader;
+use taskforce\exception\SourceFileException;
 
 require_once 'vendor/autoload.php';
 
@@ -19,9 +20,11 @@ $tables = [
 ];
 
 foreach ($tables as $table => $columns) {
-
-    $loader = new DbLoader('/domains/task-force/data/' . $table . '.csv', $table, $columns);
-
-    $loader->import();
+    try {
+        $loader = new DbLoader(__DIR__ .'/data/' . $table . '.csv', $table, $columns);
+        $loader->import();
+    } catch (SourceFileException $e) {
+        echo $e->getMessage();
+    }
 }
 

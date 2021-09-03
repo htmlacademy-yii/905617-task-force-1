@@ -18,6 +18,9 @@ class DbLoader
         $this->columns = $columns;
     }
 
+    /**
+     * @throws SourceFileException
+     */
     public function import(): void
     {
         if (!file_exists($this->filename)) {
@@ -26,23 +29,34 @@ class DbLoader
 
         try {
             $this->fileObject = new \SplFileObject($this->filename);
-        } catch (RuntimeException $exception) {
-            throw new SourceFileException("Не удалось открыть файл на чтение");
+        } catch (\RuntimeException $exception) {
+            throw new SourceFileException("Не удалось открыть файл на чтения");
         }
+
 
         $columns = '';
         $data = '';
         $dataSql = $this->getDataSql($columns, $data, $this->columns);
+
         $columns = $dataSql['columns'];
         $data = $dataSql['data'];
 
-        file_put_contents('/domains/task-force/fixtures/bd.sql', "INSERT INTO `" . $this->table . "`(" . $columns . ") VALUES " . substr($data, 0, -1) . ";" . PHP_EOL, FILE_APPEND);
+        try {
+            file_put_contents(dirname(dirname(__DIR__)).'/fixtures/bd.sql', "INSERT INTO `" . $this->table . "`(" . $columns . ") VALUES " . substr($data, 0, -1) . ";" . PHP_EOL, FILE_APPEND);
+        } catch (\LogicException $exception) {
+            throw new SourceFileException("Не удалось записать в файл");
+        }
     }
 
-
-    private function getDataSql($columns, $data, $arrayColumns)
+    /**
+     * @param $columns
+     * @param $data
+     * @param $arrayColumns
+     * @return array|string[]
+     * @throws \Exception
+     */
+    private function getDataSql($columns, $data, $arrayColumns): array
     {
-
         foreach ($this->getNextLine() as $line) {
 
             if ($this->fileObject->key() === 0) {
@@ -69,6 +83,9 @@ class DbLoader
         return ['columns' => $columns, 'data' => $data];
     }
 
+    /**
+     * @return iterable|null
+     */
     private function getNextLine(): ?iterable
     {
         $this->fileObject->rewind();
